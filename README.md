@@ -1,0 +1,62 @@
+# Gala des STARS – Application de vote en ligne
+
+Application web de vote développée en **une semaine** pour un événement caritatif (Gala des STARS, ICC Nancy).
+Elle permet à l'assemblée de voter par catégorie de prix, puis à des responsables d'évaluer les finalistes, avec un classement final pondéré.
+
+> **Résultat :** [239 votes recueillis sur 7 catégories] lors de l'événement du du 2 au 18 septembre 2026[date].
+
+## Captures d'écran
+
+> Ajouter 2 ou 3 images dans `screenshots/` (avec des **données fictives**) puis les référencer ici.
+>
+> `![Page de vote Assemblée](screenshots/image.png) (screenshots/Capture d'écran 2026-11-16 015241.png)`
+> `![Page de vote Responsable](screenshots/Capture d'écran 2026-11-16 015645.png)`
+## Fonctionnalités
+
+**Vote de l'assemblée (`votes-assemblee/`)**
+- 7 catégories de prix, avec description et critères de sélection
+- Vote avec justification obligatoire pour les catégories à saisie libre
+- Compte à rebours configurable : ouverture/fermeture des votes
+- Verrou d'écriture (`LockService`) pour gérer les votes simultanés
+- Espace admin protégé par un code PIN : résultats par prix
+
+**Évaluation par les responsables (`votes-responsables/`)**
+- Notation /20 des finalistes de chaque prix, avec commentaires
+- Une seule évaluation par responsable et par prix
+- Sélection automatique du top 3 issu du vote de l'assemblée
+- Tableau de bord global : score final sur 100 (60 % assemblée, 40 % responsables)
+- Génération automatique d'une feuille « Résultats officiels »
+
+## Stack technique
+
+- **Back-end :** Google Apps Script
+- **Front-end :** HTML, JavaScript, Tailwind CSS (CDN)
+- **Base de données :** Google Sheets
+- **Hébergement :** web app Apps Script
+
+## Installation
+
+1. Créer un Google Sheet (feuilles utilisées : `Candidats`, `Votes`, `Votes_Responsables`).
+2. Ouvrir **Extensions > Apps Script** et copier les fichiers de chaque dossier dans un projet distinct.
+3. Dans `votes-responsables/Code.gs`, remplacer `VOTRE_ID_GOOGLE_SHEET` par l'ID de la feuille (visible dans son URL).
+4. Dans chaque projet, aller dans **Paramètres du projet > Propriétés du script** et ajouter :
+   - `ADMIN_PIN` : le code PIN administrateur de votre choix
+5. Dans `votes-assemblee/JavaScript.html`, remplacer la liste d'exemple `ENFANTS_PRIX6` par la vraie liste.
+6. **Déployer > Nouveau déploiement > Application Web.**
+
+## Sécurité
+
+- Le PIN admin n'est **pas** stocké dans le code : il est lu dans les propriétés du script.
+- Aucune donnée réelle (votes, noms, commentaires) n'est incluse dans ce dépôt.
+
+## Limites connues et améliorations possibles
+
+- Ajouter un contrôle PIN sur `setCountdownConfig` (assemblée) : aujourd'hui, la fonction n'est pas protégée côté serveur.
+- Garantir un vote unique par personne et par catégorie **côté serveur** (jetons à usage unique).
+- Normaliser les noms de candidats (liste déroulante ou identifiants) pour éviter des décomptes faussés par les variantes d'écriture.
+- Désactiver le bouton « Envoyer » après le premier clic pour éviter les doublons.
+- Remplacer le CDN Tailwind par une version compilée.
+
+## Ce que j'ai appris
+
+> À compléter avec tes propres mots : choix d'Apps Script + Sheets pour livrer vite et gratuitement, gestion de la concurrence, contraintes de sécurité, etc.
