@@ -9,11 +9,11 @@ Elle permet à l'assemblée de voter par catégorie de prix, puis à des respons
 
 **Vote de l'assemblée**
 
-![Page de vote de l'assemblée](screenshots/Capture%20d%27%C3%A9cran%202026-11-16%20015241.png) 
+![Page de vote de l'assemblée](gala-vote-app/screenshots/Capture%20d%27%C3%A9cran%202026-11-16%20015241.png)
 
 **Espace responsables**
 
-![Page de vote des responsables](screenshots/Capture%20d%27%C3%A9cran%202026-11-16%20015645.png)
+![Page de vote des responsables](gala-vote-app/screenshots/Capture%20d%27%C3%A9cran%202026-11-16%20015645.png)
 
 > Les visages ont été floutés pour préserver la vie privée des participants.
 
