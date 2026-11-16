@@ -1,1 +1,0 @@
-# gala-vote-app
