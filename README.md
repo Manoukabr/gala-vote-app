@@ -9,11 +9,11 @@ Elle permet à l'assemblée de voter par catégorie de prix, puis à des respons
 
 **Vote de l'assemblée**
 
-![Page de vote de l'assemblée](screenshots/vote-assemblee.png)
+![Page de vote de l'assemblée](screenshots/Capture d'écran 2026-11-16 015241.png)
 
 **Espace responsables**
 
-![Page de vote des responsables](screenshots/vote-responsables.png)
+![Page de vote des responsables](screenshots/Capture d'écran 2026-11-16 015645.png)
 
 > Les visages ont été floutés pour préserver la vie privée des participants.
 
