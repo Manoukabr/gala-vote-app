@@ -3,20 +3,26 @@
 Application web de vote développée en **une semaine** pour un événement caritatif (Gala des STARS, ICC Nancy).
 Elle permet à l'assemblée de voter par catégorie de prix, puis à des responsables d'évaluer les finalistes, avec un classement final pondéré.
 
-> **Résultat :** [239 votes recueillis sur 7 catégories] lors de l'événement du du 2 au 18 septembre 2026[date].
+**Résultat :** 239 votes recueillis sur 7 catégories, entre le 2 et le 18 septembre 2026.
 
 ## Captures d'écran
 
-> Ajouter 2 ou 3 images dans `screenshots/` (avec des **données fictives**) puis les référencer ici.
->
-> `![Page de vote Assemblée](screenshots/image.png) (screenshots/Capture d'écran 2026-11-16 015241.png)`
-> `![Page de vote Responsable](screenshots/Capture d'écran 2026-11-16 015645.png)`
+**Vote de l'assemblée**
+
+![Page de vote de l'assemblée](screenshots/vote-assemblee.png)
+
+**Espace responsables**
+
+![Page de vote des responsables](screenshots/vote-responsables.png)
+
+> Les visages ont été floutés pour préserver la vie privée des participants.
+
 ## Fonctionnalités
 
 **Vote de l'assemblée (`votes-assemblee/`)**
 - 7 catégories de prix, avec description et critères de sélection
 - Vote avec justification obligatoire pour les catégories à saisie libre
-- Compte à rebours configurable : ouverture/fermeture des votes
+- Compte à rebours configurable : ouverture et fermeture des votes
 - Verrou d'écriture (`LockService`) pour gérer les votes simultanés
 - Espace admin protégé par un code PIN : résultats par prix
 
@@ -44,10 +50,10 @@ Elle permet à l'assemblée de voter par catégorie de prix, puis à des respons
 5. Dans `votes-assemblee/JavaScript.html`, remplacer la liste d'exemple `ENFANTS_PRIX6` par la vraie liste.
 6. **Déployer > Nouveau déploiement > Application Web.**
 
-## Sécurité
+## Sécurité et confidentialité
 
 - Le PIN admin n'est **pas** stocké dans le code : il est lu dans les propriétés du script.
-- Aucune donnée réelle (votes, noms, commentaires) n'est incluse dans ce dépôt.
+- Aucun vote ni commentaire réel n'est inclus dans ce dépôt, et la liste des enfants est remplacée par des noms d'exemple.
 
 ## Limites connues et améliorations possibles
 
@@ -59,4 +65,8 @@ Elle permet à l'assemblée de voter par catégorie de prix, puis à des respons
 
 ## Ce que j'ai appris
 
-> À compléter avec tes propres mots : choix d'Apps Script + Sheets pour livrer vite et gratuitement, gestion de la concurrence, contraintes de sécurité, etc.
+- Livrer un projet complet en une semaine, et le voir utilisé en conditions réelles par une communauté.
+- Choisir Google Apps Script et Google Sheets pour aller vite, sans coût d'hébergement.
+- Gérer les écritures simultanées avec `LockService` lorsque plusieurs personnes votent en même temps.
+- Sécuriser l'accès admin : sortir le PIN du code et le vérifier côté serveur.
+- Repérer les limites à l'usage (doublons, variantes d'écriture des noms, absence de vote unique côté serveur) et les documenter pour la suite.
