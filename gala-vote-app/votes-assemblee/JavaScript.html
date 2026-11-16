@@ -1,0 +1,585 @@
+<script>
+  // DONNÉES EXACTES DES PRIX ET LEURS CRITÈRES
+  const PRIX_DATA = [
+    {
+      id: 1,
+      key: 'PRIX1',
+      titre: "Prix du Meilleur Berger / Bon Respo 🏆",
+      description: "Inspiré de Actes 20:28 et 1 Pierre 5:2-3, ce prix vise à honorer le référent/responsable qui incarne l'esprit de service, l'engagement et la bienveillance au quotidien.",
+      criteres: [
+        "Présence et régularité : personne constante dans ses engagements et sur qui l'équipe peut toujours compter.",
+        "Esprit de service : capacité à servir spontanément, y compris dans les tâches discrètes ou peu valorisées.",
+        "Attitude et humilité : fait preuve de douceur, de patience et agit sans chercher la mise en avant personnelle.",
+        "Intégrité : attitude cohérente avec les valeurs de ICC, tant dans ses paroles que dans ses actes.",
+        "Bienveillance : accueil chaleureux, attention portée aux personnes isolées ou aux nouveaux venus.",
+        "Esprit d'équipe : capacité à encourager les autres, à collaborer dans la paix et à valoriser les initiatives des membres.",
+        "Force de proposition : cherche à faire avancer les projets et à résoudre les problèmes avec sagesse.",
+        "Transmission : prend le temps d'aider, de former ou d'accompagner les plus jeunes ou les plus nouveaux."
+      ]
+    },
+    {
+      id: 2,
+      key: 'PRIX2',
+      titre: "Prix du Bon et Fidèle Serviteur 🏆",
+      description: "Inspiré de la Parabole des talents (Matthieu 25:21), ce prix vise à honorer le serviteur qui prend garde à bien accomplir toutes les tâches qui lui sont confiées.",
+      criteres: [
+        "Sérieux et excellence, même en l'absence de son responsable",
+        "Respect strict des tâches confiées",
+        "Esprit de sacrifice",
+        "Fidélité aux activités de l'église et aux réunions de son département",
+        "Productivité des talents",
+        "Disponibilité",
+        "Intégrité et Sainteté",
+        "Humilité",
+        "Diligence",
+        "Loyauté",
+        "Amour du prochain",
+        "Persévérance dans le service"
+      ]
+    },
+{
+      id: 3,
+      key: 'PRIX3',
+      titre: "Prix de la Femme Khayil 🏆",
+      description: "Inspiré de Proverbes 31:10, ce prix honore la femme d'impact qui incarne la sagesse, transforme son environnement et brille par un modèle d'excellence au service du Royaume.",
+      criteres: [
+        "Influence et leadership spirituel : femme de foi et de prière dont la maturité spirituelle inspire, guide et fortifie les autres.",
+        "Transformation de l'environnement : capacité à être un agent de changement, à apporter la paix, la joie et à impacter positivement son entourage.",
+        "Modèle d'Excellence (Esprit Khayil) : fait preuve de valeur, de force, d'intégrité et de rigueur dans tout ce qu'elle entreprend."
+      ]
+    },
+    {
+      id: 4,
+      key: 'PRIX4',
+      titre: "Prix du Jeune Prodige 🏆",
+      description: "Inspiré de 1 Timothée 4:12, ce prix célèbre un jeune qui brille par des talents exceptionnels, un engagement remarquable et un leadership émergent.",
+      criteres: [
+        "Consécration : résolu(e) à vivre une vie de sainteté",
+        "Dynamisme : au service de Dieu et source de bénédiction pour son entourage",
+        "Engagement : persévérance dans le service et la foi"
+      ]
+    },
+    {
+      id: 5,
+      key: 'PRIX5',
+      titre: "Prix de l'Homme Kephalé 🏆",
+      description: "Inspiré de Josué 24:15, ce prix récompense l'homme mature et exemplaire qui assume pleinement son rôle de leader serviteur.",
+      criteres: [
+        "Leadership modèle et intégrité",
+        "Vision et mentalité d'excellence",
+        "Engagement et bâtisseur"
+      ]
+    },
+    {
+      id: 6,
+      key: 'PRIX6',
+      titre: "Prix Impact Junior 🏆",
+      description: "Reconnaissant que les enfants sont un héritage de Dieu, ce prix valorise l'enfant qui grandit conformément aux principes et valeurs bibliques(Proverbes 22:6).",
+      criteres: [
+        "Attitude d'adoration : participation active, joie et ferveur",
+        "Appétit pour la Parole : assimilation des enseignements et versets",
+        "Fidélité et assiduité aux activités",
+        "Fruits de l'Esprit : comportement exemplaire"
+      ]
+    },
+        {
+      id: 7,
+      key: 'PRIX7',
+      titre: "Prix Épaphras 🏆",
+      description: "Inspiré d'une figure biblique dont le nom est tiré (Colossiens 4:12), le prix Épaphras tend à mettre à l'honneur une grâce essentielle et souvent invisible dans l'Église : la fidélité dans la prière. Il ne vise pas à mettre en avant une personne par orgueil, mais à rendre grâce à Dieu pour ce pilier invisible qui soutient au quotidien l'Église par ses prières, ses genoux pliés.",
+      criteres: [
+        "Sa régularité et sa persévérance dans la vie de prière.",
+        "Son cœur d'intercesseur, portant fidèlement les besoins de l'Église et des membres.",
+        "Son humilité, servant le Seigneur et son prochain avec discrétion."
+      ]
+    }
+  ];
+
+  let selectedCandidateName = "";
+  let votedPrix = {};         
+
+  let timerInterval = null;
+  let targetDateMs = null;
+  let isTimerActive = false;
+
+  // Navigation entre les pages
+  function showPage(pageId) {
+    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    const target = document.getElementById(`page-${pageId}`);
+    if (target) target.classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  // Navigation directe vers un Prix
+  function navigateToPrix(prixId) {
+    if (!isTimerActive) {
+      alert("Les votes sont actuellement fermés.");
+      return;
+    }
+    if (targetDateMs && Date.now() >= targetDateMs) {
+      alert("Le temps imparti pour voter est écoulé !");
+      return;
+    }
+
+    const prixKey = prixId.toUpperCase();
+
+    if (votedPrix[prixKey]) {
+      alert("Vous avez déjà enregistré votre vote pour ce Prix !");
+      return;
+    }
+
+    showPage(prixId);
+  }
+
+  function updateCounter(inputId, countId) {
+    const input = document.getElementById(inputId);
+    const count = document.getElementById(countId);
+    if (input && count) count.innerText = input.value.length;
+  }
+
+  // Chargement initial
+  window.onload = function() {
+    renderPrixCards();
+    restoreVotedStatus();
+    initCountdown();
+    google.script.run.withSuccessHandler(renderCandidates).getCandidates();
+    setupFreeVoteForms();
+  };
+
+  // Génération des cartes de Prix
+  function renderPrixCards() {
+    const container = document.getElementById('prix-cards-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    PRIX_DATA.forEach(p => {
+      const cardHtml = `
+        <div id="card-${p.key.toLowerCase()}" class="prix-card bg-slate-800 border-2 border-slate-700 hover:border-indigo-500/80 rounded-2xl p-6 shadow-xl transition-all flex flex-col justify-between relative group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg">
+                Prix N°${p.id}
+              </span>
+              <span id="badge-${p.key.toLowerCase()}" class="text-xs font-bold px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                À voter
+              </span>
+            </div>
+
+            <h3 class="font-bold text-lg text-white mb-2 leading-snug">${p.titre}</h3>
+            <p class="text-xs text-slate-400 line-clamp-3 mb-4">${p.description}</p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
+            <button onclick="event.stopPropagation(); openCriteresModal(${p.id})" class="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-indigo-300 transition-colors py-1 px-2 rounded-lg hover:bg-slate-700/50">
+              <span>ℹ️</span>
+              <span class="underline underline-offset-2 font-medium">Voir les critères</span>
+            </button>
+
+            <button onclick="navigateToPrix('${p.key.toLowerCase()}')" class="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl transition shadow">
+              Voter →
+            </button>
+          </div>
+        </div>
+      `;
+      container.innerHTML += cardHtml;
+    });
+  }
+
+  // Modale de critères
+  function openCriteresModal(prixId) {
+    const prix = PRIX_DATA.find(p => p.id === prixId);
+    if (!prix) return;
+
+    document.getElementById('criteres-modal-title').innerText = `Prix N°${prix.id} : ${prix.titre}`;
+    document.getElementById('criteres-modal-desc').innerText = prix.description;
+
+    const listContainer = document.getElementById('criteres-modal-list');
+    listContainer.innerHTML = '';
+    
+    prix.criteres.forEach(c => {
+      listContainer.innerHTML += `
+        <li class="flex items-start space-x-2 bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/40">
+          <span class="text-indigo-400 text-sm mt-0.5">•</span>
+          <span class="leading-relaxed">${c}</span>
+        </li>
+      `;
+    });
+
+    document.getElementById('criteres-modal').classList.remove('hidden');
+  }
+
+  function closeCriteresModal() {
+    document.getElementById('criteres-modal').classList.add('hidden');
+  }
+
+  // Gestion du décompte
+  function initCountdown() {
+    google.script.run.withSuccessHandler(config => {
+      isTimerActive = config.isActive;
+      if (config.targetDate) {
+        targetDateMs = new Date(config.targetDate).getTime();
+        document.getElementById('admin-target-date').value = config.targetDate;
+      }
+      startTimerLoop();
+    }).getCountdownConfig();
+  }
+
+  function startTimerLoop() {
+    if (timerInterval) clearInterval(timerInterval);
+
+    const display = document.getElementById('timer-display');
+    const stoppedMsg = document.getElementById('timer-stopped-msg');
+    const title = document.getElementById('timer-status-title');
+
+    timerInterval = setInterval(() => {
+      if (!isTimerActive || !targetDateMs) {
+        display.classList.add('hidden');
+        stoppedMsg.classList.remove('hidden');
+        title.innerText = "Statut des votes";
+        return;
+      }
+
+      const now = Date.now();
+      const diff = targetDateMs - now;
+
+      if (diff <= 0) {
+        display.classList.add('hidden');
+        stoppedMsg.classList.remove('hidden');
+        stoppedMsg.innerText = "⌛ Le temps de vote est expiré !";
+        title.innerText = "Statut des votes";
+        isTimerActive = false;
+        clearInterval(timerInterval);
+        return;
+      }
+
+      display.classList.remove('hidden');
+      stoppedMsg.classList.add('hidden');
+      title.innerText = "Temps restant pour voter";
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / 1000 / 60) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('timer-days').innerText = String(days).padStart(2, '0');
+      document.getElementById('timer-hours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('timer-minutes').innerText = String(mins).padStart(2, '0');
+      document.getElementById('timer-seconds').innerText = String(secs).padStart(2, '0');
+    }, 1000);
+  }
+
+  function updateCountdown(enable) {
+    const targetInput = document.getElementById('admin-target-date').value;
+    const status = document.getElementById('admin-timer-status');
+
+    if (enable && !targetInput) {
+      status.className = "text-center text-xs font-semibold text-red-400";
+      status.innerText = "Veuillez choisir une date et heure de fin.";
+      return;
+    }
+
+    status.className = "text-center text-xs font-semibold text-indigo-400";
+    status.innerText = "Enregistrement en cours...";
+
+    google.script.run.withSuccessHandler(res => {
+      isTimerActive = res.isActive;
+      targetDateMs = res.targetDate ? new Date(res.targetDate).getTime() : null;
+      startTimerLoop();
+
+      status.className = "text-center text-xs font-semibold text-emerald-400";
+      status.innerText = enable ? "Décompte démarré avec succès !" : "Décompte arrêté / Votes fermés !";
+    }).setCountdownConfig(targetInput, enable);
+  }
+
+  function restoreVotedStatus() {
+    try {
+      const saved = localStorage.getItem('ceremonie_voted_prix');
+      if (saved) {
+        votedPrix = JSON.parse(saved);
+        Object.keys(votedPrix).forEach(prixKey => {
+          if (votedPrix[prixKey]) {
+            markPrixAsVoted(prixKey);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Erreur de stockage local :", e);
+    }
+  }
+
+  function saveVotedPrix(prixKey) {
+    votedPrix[prixKey] = true;
+    try {
+      localStorage.setItem('ceremonie_voted_prix', JSON.stringify(votedPrix));
+    } catch (e) {
+      console.error("Erreur de sauvegarde local :", e);
+    }
+  }
+
+  // Rendu Candidats (Prix 1)
+  function renderCandidates(candidates) {
+    const container = document.getElementById('candidates-grid');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const p1 = PRIX_DATA.find(p => p.id === 1);
+    if (p1 && document.getElementById('prix1-title-header')) {
+      document.getElementById('prix1-title-header').innerText = `Prix N°1 : ${p1.titre}`;
+    }
+
+    candidates.forEach(c => {
+      container.innerHTML += `
+        <div onclick="openModal('${c.id}', '${c.name.replace(/'/g, "\\'")}', '${c.photoUrl}')" class="bg-slate-800 border-2 border-slate-700 hover:border-indigo-500 rounded-2xl p-4 cursor-pointer text-center shadow-lg transition-all transform hover:-translate-y-1">
+          <img src="${c.photoUrl}" alt="${c.name}" class="w-full h-48 object-contain bg-slate-900/50 rounded-xl mb-3">
+          <h3 class="font-bold text-xl text-white">${c.name}</h3>
+          <p class="text-sm text-slate-400 mt-1 mb-4">${c.description || ''}</p>
+          <span class="bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl font-semibold">Voter pour ${c.name}</span>
+        </div>
+      `;
+    });
+  }
+
+  function openModal(id, name, photoUrl) {
+    if (votedPrix["PRIX1"]) {
+      alert("Vous avez déjà voté pour le Prix 1.");
+      return;
+    }
+    selectedCandidateName = name;
+    
+    document.getElementById('modal-candidate-name').innerText = name;
+    document.getElementById('modal-candidate-img').src = photoUrl;
+    document.getElementById('modal-reason').value = '';
+    document.getElementById('modal-count').innerText = "0";
+    document.getElementById('modal-status').innerText = '';
+
+    const p1 = PRIX_DATA.find(p => p.id === 1);
+    const criteresList = document.getElementById('prix1-modal-criteres');
+    if (p1 && criteresList) {
+      criteresList.innerHTML = p1.criteres.map(c => `<li>${c}</li>`).join('');
+    }
+
+    document.getElementById('vote-modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('vote-modal').classList.add('hidden');
+  }
+
+  // Vote Prix 1 (Justification obligatoire)
+  function sendVotePrix1() {
+    const reason = document.getElementById('modal-reason').value.trim();
+    const status = document.getElementById('modal-status');
+    const btn = document.getElementById('modal-submit-btn');
+
+    if (!reason) {
+      status.className = "text-center text-sm font-semibold text-red-400";
+      status.innerText = "La justification du vote est obligatoire.";
+      return;
+    }
+
+    btn.disabled = true;
+    status.className = "text-center text-sm font-semibold text-indigo-400";
+    status.innerText = "Validation de votre vote...";
+
+    const p1 = PRIX_DATA.find(p => p.id === 1);
+    const prixTitle = p1 ? p1.titre : "Prix 1";
+
+    google.script.run.withSuccessHandler(res => {
+      btn.disabled = false;
+      if (res.success) {
+        status.className = "text-center text-sm font-semibold text-emerald-400";
+        status.innerText = res.message;
+        saveVotedPrix("PRIX1");
+        
+        setTimeout(() => {
+          closeModal();
+          markPrixAsVoted("PRIX1");
+          showPage('home');
+        }, 1500);
+      } else {
+        status.className = "text-center text-sm font-semibold text-red-400";
+        status.innerText = res.message;
+      }
+    }).submitVote(prixTitle, selectedCandidateName, "", reason);
+  }
+
+  // Formulaires Prix libres 2 à 6 (Justification obligatoire)
+  function setupFreeVoteForms() {
+    const freePrix = PRIX_DATA.filter(p => p.id >= 2);
+    const template = document.getElementById('free-vote-template');
+    if (!template) return;
+
+    const ENFANTS_PRIX6 = [
+      "Enfant 1", "Enfant 2", "Enfant 3", "Enfant 4", "Enfant 5"
+    ]; // Exemple : remplacer par la vraie liste (ne pas publier de vrais prénoms)
+
+    freePrix.forEach(p => {
+      const container = document.getElementById(`container-${p.key.toLowerCase()}`);
+      if (!container) return;
+
+      const clone = template.content.cloneNode(true);
+      clone.querySelector('.title-placeholder').innerText = `Vote Prix N°${p.id} : ${p.titre}`;
+      clone.querySelector('.desc-placeholder').innerText = p.description;
+
+      const criteresContainer = clone.querySelector('.criteres-list');
+      if (criteresContainer) {
+        criteresContainer.innerHTML = p.criteres.map(c => `<li>${c}</li>`).join('');
+      }
+
+      const inputNameContainer = clone.querySelector('.input-name').parentElement;
+      const reasonInput = clone.querySelector('.input-reason');
+      const charCount = clone.querySelector('.char-count');
+      const statusMsg = clone.querySelector('.status-msg');
+      const btn = clone.querySelector('.submit-btn');
+
+      if (p.id === 6) {
+        let optionsHtml = '<option value="">-- Sélectionnez un enfant --</option>';
+        ENFANTS_PRIX6.forEach(nom => {
+          optionsHtml += `<option value="${nom}">${nom}</option>`;
+        });
+
+        inputNameContainer.innerHTML = `
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Nom de l'enfant</label>
+          <select class="input-name w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
+            ${optionsHtml}
+          </select>
+        `;
+      }
+
+      reasonInput.oninput = () => charCount.innerText = reasonInput.value.length;
+
+      btn.onclick = () => {
+        if (votedPrix[p.key]) {
+          alert("Vous avez déjà voté pour ce Prix !");
+          return;
+        }
+
+        const candidateInput = container.querySelector('.input-name');
+        const candidateName = candidateInput ? candidateInput.value.trim() : "";
+        const reason = reasonInput.value.trim();
+
+        if (!candidateName) {
+          statusMsg.className = "status-msg text-center text-sm font-semibold text-red-400";
+          statusMsg.innerText = p.id === 6 ? "Veuillez sélectionner un enfant dans la liste." : "Saisissez le nom de la personne.";
+          return;
+        }
+
+        if (!reason) {
+          statusMsg.className = "status-msg text-center text-sm font-semibold text-red-400";
+          statusMsg.innerText = "La justification de votre vote est obligatoire.";
+          return;
+        }
+
+        btn.disabled = true;
+        statusMsg.className = "status-msg text-center text-sm font-semibold text-indigo-400";
+        statusMsg.innerText = "Enregistrement du vote...";
+
+        google.script.run.withSuccessHandler(res => {
+          btn.disabled = false;
+          if (res.success) {
+            statusMsg.className = "status-msg text-center text-sm font-semibold text-emerald-400";
+            statusMsg.innerText = res.message;
+            saveVotedPrix(p.key);
+            
+            setTimeout(() => {
+              markPrixAsVoted(p.key);
+              showPage('home');
+            }, 1500);
+          } else {
+            statusMsg.className = "status-msg text-center text-sm font-semibold text-red-400";
+            statusMsg.innerText = res.message;
+          }
+        }).submitVote(p.titre, candidateName, "", reason);
+      };
+
+      container.appendChild(clone);
+    });
+  }
+
+  // Verrouillage visuel
+  function markPrixAsVoted(prixKey) {
+    const cardId = `card-${prixKey.toLowerCase()}`;
+    const badgeId = `badge-${prixKey.toLowerCase()}`;
+    
+    const card = document.getElementById(cardId);
+    const badge = document.getElementById(badgeId);
+
+    if (card) {
+      const voteBtn = card.querySelector('button[onclick*="navigateToPrix"]');
+      if (voteBtn) {
+        voteBtn.disabled = true;
+        voteBtn.className = "text-xs font-bold bg-slate-700 text-slate-400 px-4 py-2 rounded-xl cursor-not-allowed";
+        voteBtn.innerText = "Voté";
+      }
+      card.classList.add('opacity-70', 'border-emerald-500/50', 'bg-slate-800/60');
+    }
+
+    if (badge) {
+      badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+      badge.innerText = "✅ Voté";
+    }
+  }
+
+  // Espace Admin sécurisé
+  function unlockResults() {
+    const pin = document.getElementById('admin-pin').value;
+    const errorMsg = document.getElementById('admin-error');
+    errorMsg.innerText = "Vérification en cours...";
+
+    google.script.run.withSuccessHandler(res => {
+      if (res.success) {
+        errorMsg.innerText = "";
+        document.getElementById('admin-lock').classList.add('hidden');
+        document.getElementById('admin-content').classList.remove('hidden');
+        displayResults(res.data);
+      } else {
+        errorMsg.innerText = res.message;
+      }
+    }).getResultsData(pin);
+  }
+
+  function displayResults(data) {
+    const container = document.getElementById('results-display');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (Object.keys(data).length === 0) {
+      container.innerHTML = '<p class="text-slate-400 text-sm italic">Aucun vote enregistré pour le moment.</p>';
+      return;
+    }
+
+    for (const [prix, result] of Object.entries(data)) {
+      const total = result.totalVotants;
+
+      let html = `
+        <div class="mb-6 bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-700">
+            <h3 class="font-bold text-base text-indigo-400">${prix}</h3>
+            <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg">
+              Total : ${total} votant${total > 1 ? 's' : ''}
+            </span>
+          </div>
+          <ul class="space-y-2">
+      `;
+
+      for (const [name, count] of Object.entries(result.candidates)) {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+
+        html += `
+          <li class="space-y-1">
+            <div class="flex justify-between text-sm">
+              <span class="text-white font-medium">${name}</span>
+              <span class="font-bold text-slate-300">${count} vote${count > 1 ? 's' : ''} <span class="text-indigo-400 ml-1">(${percentage} %)</span></span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div class="bg-indigo-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+            </div>
+          </li>
+        `;
+      }
+
+      html += `</ul></div>`;
+      container.innerHTML += html;
+    }
+  }
+</script>

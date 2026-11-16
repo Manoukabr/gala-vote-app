@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <title>Espace Responsables & Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-8 font-sans">
+
+  <div class="max-w-4xl mx-auto space-y-8">
+    
+    <!-- EN-TÊTE -->
+    <header class="flex justify-between items-center border-b border-amber-500/20 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-amber-400">Gala des STARS — Votes Responsables</h1>
+        <p class="text-xs text-slate-400">Évaluation Responsables & Dashboard Central</p>
+      </div>
+      <div class="space-x-2">
+        <button onclick="switchTab('vote')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 hover:text-white">Vote Responsable</button>
+        <button onclick="switchTab('dashboard')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 rounded-lg text-xs font-bold text-white shadow">Dashboard Global</button>
+      </div>
+    </header>
+
+    <!-- BANNIÈRE COMPTE À REBOURS (VISIBILITÉ CONTRÔLÉE SELON L'ONGLET) -->
+    <div id="resp-timer-banner" class="bg-slate-900 border border-amber-500/30 rounded-2xl p-4 text-center shadow-lg">
+      <p id="timer-title-status" class="text-[11px] uppercase tracking-wider text-amber-400 font-bold mb-2">⏳ Temps restant pour évaluer</p>
+      <div id="timer-counters" class="flex justify-center space-x-3 text-white">
+        <div class="bg-slate-950 border border-slate-800 p-2 rounded-xl w-16">
+          <span id="timer-days" class="block text-xl font-bold text-amber-400">00</span>
+          <span class="text-[9px] text-slate-400 uppercase font-semibold">Jours</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-2 rounded-xl w-16">
+          <span id="timer-hours" class="block text-xl font-bold text-amber-400">00</span>
+          <span class="text-[9px] text-slate-400 uppercase font-semibold">Heures</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-2 rounded-xl w-16">
+          <span id="timer-minutes" class="block text-xl font-bold text-amber-400">00</span>
+          <span class="text-[9px] text-slate-400 uppercase font-semibold">Min</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-2 rounded-xl w-16">
+          <span id="timer-seconds" class="block text-xl font-bold text-amber-400">00</span>
+          <span class="text-[9px] text-slate-400 uppercase font-semibold">Sec</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION VOTES RESPONSABLES -->
+    <section id="tab-vote" class="space-y-6">
+      <div id="evaluationContent" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h2 id="prix-selector-title" class="text-xl font-bold text-white mb-2">Votre Évaluation Départementale</h2>
+        
+        <div id="vote-form-container" class="hidden space-y-6 border-t border-slate-800 pt-6">
+          <div class="bg-amber-500/10 border border-amber-500/20 p-5 rounded-xl space-y-2">
+            <h3 id="current-prix-title" class="text-lg font-bold text-amber-400"></h3>
+            <p id="current-prix-desc" class="text-xs text-slate-300 italic"></p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Votre Nom & Prénom (Responsable) *</label>
+            <input type="text" id="resp-name" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-500" placeholder="Ex: Pasteur Marc / Responsable Sophie">
+          </div>
+
+          <!-- LISTE DES CANDIDATS -->
+          <div id="candidates-evaluation-list" class="space-y-6"></div>
+
+          <div id="vote-status" class="text-center text-sm font-semibold"></div>
+
+          <button id="submit-btn" onclick="submitEvaluation()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
+            Enregistrer mes évaluations
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION DASHBOARD CENTRAL -->
+    <section id="tab-dashboard" class="hidden space-y-6">
+      <div id="admin-lock" class="max-w-md mx-auto bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 text-center">
+        <h3 class="text-lg font-bold text-white">Accès Réservé au Comité</h3>
+        <p class="text-xs text-slate-400">Entrez le code PIN pour consulter les scores ou gérer la session.</p>
+        <input type="password" id="admin-pin" placeholder="Code PIN Admin" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-center outline-none focus:border-amber-500">
+        <button onclick="loadDashboard()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition">Consulter le Dashboard</button>
+        <p id="admin-error" class="text-xs text-red-400 font-semibold"></p>
+      </div>
+
+      <div id="admin-results" class="hidden space-y-6">
+        
+        <!-- PANNEAU DE CONTRÔLE MINUTEUR POUR ADMIN -->
+        <div class="bg-slate-900 border border-amber-500/30 p-5 rounded-2xl space-y-3">
+          <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider">⚙️ Contrôle de la Session de Vote (Admin)</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Date & Heure Limite de fin</label>
+              <input type="datetime-local" id="admin-target-date" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs outline-none focus:border-amber-500">
+            </div>
+            <div class="flex space-x-2">
+              <button onclick="saveAdminTimer(true)" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition">Ouvrir la session</button>
+              <button onclick="saveAdminTimer(false)" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs transition">Fermer la session</button>
+            </div>
+          </div>
+          <p id="admin-timer-status" class="text-xs text-center font-semibold min-h-[16px]"></p>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold text-white">Résultats Combinés (60% Assemblée / 40% Responsables)</h2>
+          <button onclick="loadDashboard()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700">🔄 Actualiser</button>
+        </div>
+        <div id="dashboard-grid" class="space-y-6"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const PRIX_DETAILS = {
+      'PRIX1': {
+        title: "Prix du Meilleur Berger / Bon Respo 🏆",
+        desc: "Inspiré de Actes 20:28 et 1 Pierre 5:2-3, ce prix vise à honorer le référent/responsable qui incarne l'esprit de service, l'engagement et la bienveillance au quotidien.",
+        criteres: [
+          { name: "Présence et régularité (constante dans ses engagements)", max: 2.5 },
+          { name: "Esprit de service (tâches discrètes ou peu valorisées)", max: 2.5 },
+          { name: "Attitude et humilité (douceur, patience)", max: 2.5 },
+          { name: "Intégrité (cohérence avec les valeurs ICC)", max: 2.5 },
+          { name: "Bienveillance (accueil chaleureux et attention)", max: 2.5 },
+          { name: "Esprit d'équipe (encourager et collaborer dans la paix)", max: 2.5 },
+          { name: "Force de proposition (résoudre avec sagesse)", max: 2.5 },
+          { name: "Transmission (former et accompagner)", max: 2.5 }
+        ]
+      },
+      'PRIX2': {
+        title: "Prix du Bon et Fidèle Serviteur 🏆",
+        desc: "Inspiré de la Parabole des talents (Matthieu 25:21), ce prix vise à honorer le serviteur qui prend garde à bien accomplir toutes les tâches qui lui sont confiées.",
+        criteres: [
+          { name: "Sérieux, excellence et respect strict des tâches", max: 3.5 },
+          { name: "Fidélité, assiduité et disponibilité", max: 3.5 },
+          { name: "Esprit de sacrifice et persévérance", max: 3 },
+          { name: "Productivité des talents et diligence", max: 3 },
+          { name: "Intégrité, Sainteté et Humilité", max: 3.5 },
+          { name: "Loyauté et Amour du prochain", max: 3.5 }
+        ]
+      },
+      'PRIX3': {
+        title: "Prix de la Femme Khayil 🏆",
+        desc: "Inspiré de Proverbes 31:10, ce prix honore la femme d'impact qui incarne la sagesse, transforme son environnement et brille par un modèle d'excellence au service du Royaume.",
+        criteres: [
+          { name: "Influence et leadership spirituel (femme de foi et de prière)", max: 7 },
+          { name: "Transformation de l'environnement (agent de changement, paix et joie)", max: 6.5 },
+          { name: "Modèle d'Excellence - Esprit Khayil (valeur, force, rigueur)", max: 6.5 }
+        ]
+      },
+      'PRIX4': {
+        title: "Prix du Jeune Prodige 🏆",
+        desc: "Inspiré de 1 Timothée 4:12, ce prix célèbre un jeune qui brille par des talents exceptionnels, un engagement remarquable et un leadership émergent.",
+        criteres: [
+          { name: "Consécration (vie de sainteté)", max: 6.5 },
+          { name: "Dynamisme (service de Dieu et source de bénédiction)", max: 7 },
+          { name: "Engagement (persévérance dans le service et la foi)", max: 6.5 }
+        ]
+      },
+      'PRIX5': {
+        title: "Prix de l'Homme Kephalé 🏆",
+        desc: "Inspiré de Josué 24:15, ce prix récompense l'homme mature et exemplaire qui assume pleinement son rôle de leader serviteur.",
+        criteres: [
+          { name: "Leadership modèle et intégrité", max: 7 },
+          { name: "Vision et mentalité d'excellence", max: 6.5 },
+          { name: "Engagement et bâtisseur", max: 6.5 }
+        ]
+      },
+      'PRIX6': {
+        title: "Prix Impact Junior 🏆",
+        desc: "Reconnaissant que les enfants sont un héritage de Dieu, ce prix valorise l'enfant qui grandit conformément aux principes et valeurs bibliques (Proverbes 22:6).",
+        criteres: [
+          { name: "Attitude d'adoration (participation active, joie et ferveur)", max: 5 },
+          { name: "Appétit pour la Parole (assimilation enseignements et versets)", max: 5 },
+          { name: "Fidélité et assiduité aux activités", max: 5 },
+          { name: "Fruits de l'Esprit (comportement exemplaire)", max: 5 }
+        ]
+      },
+      'PRIX7': {
+        title: "Prix Épaphras 🏆",
+        desc: "Inspiré de Colossiens 4:12, ce prix met à l'honneur une grâce essentielle et souvent invisible : la fidélité dans la prière et le soutien invisible de l'Église.",
+        criteres: [
+          { name: "Régularité et persévérance dans la vie de prière", max: 7 },
+          { name: "Cœur d'intercesseur (portant fidèlement les besoins)", max: 7 },
+          { name: "Humilité (servir avec discrétion)", max: 6 }
+        ]
+      }
+    };
+
+    let top3Data = {};
+    let activePrixKey = "<?!= selectedPrixKey ?>";
+    let countdownInterval = null;
+
+    window.onload = function() {
+      if (!activePrixKey || !PRIX_DETAILS[activePrixKey]) {
+        document.getElementById('tab-vote').innerHTML = `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
+            <p class="text-amber-400 font-bold text-base">Lien incomplet ou invalide</p>
+            <p class="text-slate-400 text-xs">Veuillez utiliser le lien spécifique qui vous a été transmis pour votre département.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const currentPrix = PRIX_DETAILS[activePrixKey];
+      document.getElementById('prix-selector-title').innerText = "Évaluation : " + currentPrix.title;
+      document.getElementById('current-prix-title').innerText = currentPrix.title;
+      document.getElementById('current-prix-desc').innerText = currentPrix.desc;
+
+      google.script.run.withSuccessHandler(res => {
+        top3Data = res.top3 || {};
+        
+        if (res.config) {
+          if (!res.config.isOpen) {
+            showClosedSessionUI();
+            return;
+          }
+
+          if (res.config.targetDate) {
+            startTimer(res.config.targetDate);
+          }
+        }
+
+        selectPrix(activePrixKey);
+      }).getTop3ByPrix();
+    };
+
+    function startTimer(targetDateStr) {
+      if (!targetDateStr) return;
+
+      const targetTime = new Date(targetDateStr).getTime();
+      if (isNaN(targetTime)) return;
+
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const diff = targetTime - now;
+
+        if (diff <= 0) {
+          clearInterval(countdownInterval);
+          document.getElementById('timer-days').innerText = '00';
+          document.getElementById('timer-hours').innerText = '00';
+          document.getElementById('timer-minutes').innerText = '00';
+          document.getElementById('timer-seconds').innerText = '00';
+          
+          document.getElementById('timer-title-status').innerText = "⛔ Temps écoulé — Évaluations terminées";
+          document.getElementById('timer-title-status').className = "text-[11px] uppercase tracking-wider text-rose-400 font-bold mb-2";
+          
+          showClosedSessionUI();
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('timer-days').innerText = String(days).padStart(2, '0');
+        document.getElementById('timer-hours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('timer-minutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('timer-seconds').innerText = String(seconds).padStart(2, '0');
+      }, 1000);
+    }
+
+    function showClosedSessionUI() {
+      document.getElementById('evaluationContent').innerHTML = `
+        <div class="text-center py-12 space-y-3">
+          <div class="text-5xl">⌛</div>
+          <h2 class="text-xl font-bold text-amber-400">Période d'évaluation terminée</h2>
+          <p class="text-xs text-slate-400 max-w-md mx-auto">
+            Le temps imparti pour évaluer les candidats est écoulé. Les soumissions sont désormais fermées.
+          </p>
+        </div>
+      `;
+    }
+
+    function switchTab(tabName) {
+      document.getElementById('tab-vote').classList.add('hidden');
+      document.getElementById('tab-dashboard').classList.add('hidden');
+      
+      const timerBanner = document.getElementById('resp-timer-banner');
+
+      if (tabName === 'dashboard') {
+        timerBanner.classList.add('hidden');
+      } else {
+        timerBanner.classList.remove('hidden');
+      }
+
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+
+    function selectPrix(key) {
+      activePrixKey = key;
+      document.getElementById('vote-form-container').classList.remove('hidden');
+
+      const listContainer = document.getElementById('candidates-evaluation-list');
+      listContainer.innerHTML = '';
+
+      const candidates = top3Data[key] || [];
+
+      if (candidates.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Aucun vote assemblée enregistré pour ce prix pour le moment.</p>`;
+        return;
+      }
+
+      const criteres = PRIX_DETAILS[key].criteres;
+
+      candidates.forEach((c, idx) => {
+        let criteresHtml = '';
+        criteres.forEach((crit) => {
+          criteresHtml += `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+              <span class="text-xs text-slate-300 font-medium">${crit.name} <span class="text-amber-500 font-bold">(/${crit.max})</span></span>
+              <input type="number" min="0" max="${crit.max}" step="0.25" 
+                     data-max="${crit.max}" 
+                     class="critere-score-${idx} w-full sm:w-24 p-2 bg-slate-950 border border-slate-700 rounded text-white text-xs font-bold outline-none focus:border-amber-500" 
+                     placeholder="0 - ${crit.max}" 
+                     oninput="recalculateCandidateTotal(${idx})">
+            </div>
+          `;
+        });
+
+        listContainer.innerHTML += `
+          <div class="candidate-row bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4" data-name="${c.name}" data-idx="${idx}">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+              <span class="font-bold text-white text-base">${c.name}</span>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-[11px] font-bold uppercase text-amber-400 tracking-wider">Notation par critères (Total = 20 pts)</label>
+              ${criteresHtml}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800/60">
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex flex-col justify-center items-center">
+                <span class="text-[10px] uppercase font-bold text-slate-400">Note Finale</span>
+                <span id="candidate-total-${idx}" class="text-xl font-extrabold text-amber-400">0.0 / 20</span>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Commentaire motivé * (Obligatoire)</label>
+                <textarea id="comment-${idx}" class="input-comment w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs outline-none focus:border-amber-500 h-16 resize-none" placeholder="Expliquez brièvement votre appréciation pour ce nominé..."></textarea>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function recalculateCandidateTotal(idx) {
+      const inputs = document.querySelectorAll(`.critere-score-${idx}`);
+      let total = 0;
+
+      inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val >= 0) {
+          total += val;
+        }
+      });
+
+      document.getElementById(`candidate-total-${idx}`).innerText = total.toFixed(1) + " / 20";
+    }
+
+    function submitEvaluation() {
+      const respName = document.getElementById('resp-name').value.trim();
+      const status = document.getElementById('vote-status');
+      const submitBtn = document.getElementById('submit-btn');
+
+      if (!respName) {
+        status.className = "text-center text-sm font-semibold text-red-400";
+        status.innerText = "⚠️ Veuillez renseigner votre Nom & Prénom.";
+        return;
+      }
+
+      const rows = document.querySelectorAll('.candidate-row');
+      const ratings = [];
+      let valid = true;
+      let errorMsg = "";
+
+      rows.forEach(r => {
+        const idx = r.getAttribute('data-idx');
+        const cName = r.getAttribute('data-name');
+        
+        const commentEl = document.getElementById(`comment-${idx}`);
+        const comment = commentEl ? commentEl.value.trim() : "";
+
+        if (!comment) {
+          valid = false;
+          errorMsg = "Le commentaire est obligatoire pour tous les candidats.";
+        }
+
+        const inputs = document.querySelectorAll(`.critere-score-${idx}`);
+        let scoreTotal = 0;
+        let detailsList = [];
+
+        inputs.forEach(input => {
+          const val = parseFloat(input.value);
+          const max = parseFloat(input.getAttribute('data-max'));
+
+          if (isNaN(val) || val < 0 || val > max) {
+            valid = false;
+            if (!errorMsg) errorMsg = "Certaines notes dépassent le barème autorisé.";
+          } else {
+            scoreTotal += val;
+            detailsList.push(val + "/" + max);
+          }
+        });
+
+        ratings.push({
+          candidateName: cName,
+          score: scoreTotal,
+          comment: comment,
+          detailsCritique: detailsList.join(" | ")
+        });
+      });
+
+      if (!valid) {
+        status.className = "text-center text-sm font-semibold text-red-400";
+        status.innerText = "⚠️ " + errorMsg;
+        return;
+      }
+
+      status.className = "text-center text-sm font-semibold text-amber-400";
+      status.innerText = "⏳ Enregistrement en cours...";
+      submitBtn.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(res => {
+          if (res && res.success) {
+            document.getElementById('evaluationContent').innerHTML = `
+              <div class="text-center py-12 space-y-4">
+                <div class="text-5xl">🎉</div>
+                <h2 class="text-2xl font-bold text-amber-400">Merci pour votre évaluation !</h2>
+                <p class="text-sm text-slate-300 max-w-md mx-auto">
+                  Vos notes et commentaires ont bien été enregistrés pour ce prix.
+                </p>
+              </div>
+            `;
+          } else {
+            status.className = "text-center text-sm font-semibold text-red-400";
+            status.innerText = "⚠️ " + (res ? res.message : "Erreur lors de l'enregistrement.");
+            submitBtn.disabled = false;
+          }
+        })
+        .withFailureHandler(err => {
+          status.className = "text-center text-sm font-semibold text-red-400";
+          status.innerText = "⚠️ Erreur serveur : " + err.message;
+          submitBtn.disabled = false;
+        })
+        .submitResponsableVotes({
+          prixKey: activePrixKey,
+          responsableName: respName,
+          ratings: ratings
+        });
+    }
+
+    function loadDashboard() {
+      const pin = document.getElementById('admin-pin').value;
+      const errorMsg = document.getElementById('admin-error');
+
+      google.script.run.withSuccessHandler(res => {
+        if (res.success) {
+          document.getElementById('admin-lock').classList.add('hidden');
+          document.getElementById('admin-results').classList.remove('hidden');
+          
+          if (res.config && res.config.targetDate) {
+            const d = new Date(res.config.targetDate);
+            const formatted = d.toISOString().slice(0, 16);
+            document.getElementById('admin-target-date').value = formatted;
+          }
+
+          renderDashboardGrid(res.data);
+        } else {
+          errorMsg.innerText = res.message;
+        }
+      }).getGlobalDashboardData(pin);
+    }
+
+    function saveAdminTimer(isOpen) {
+      const pin = document.getElementById('admin-pin').value;
+      const targetDate = document.getElementById('admin-target-date').value;
+      const statusMsg = document.getElementById('admin-timer-status');
+
+      statusMsg.className = "text-center text-xs font-semibold text-amber-400";
+      statusMsg.innerText = "Mise à jour en cours...";
+
+      google.script.run
+        .withSuccessHandler(res => {
+          statusMsg.className = res.success ? "text-center text-xs font-semibold text-emerald-400" : "text-center text-xs font-semibold text-rose-400";
+          statusMsg.innerText = res.message;
+          
+          if (res.success && res.targetDate) {
+            startTimer(res.targetDate);
+          }
+        })
+        .withFailureHandler(err => {
+          statusMsg.className = "text-center text-xs font-semibold text-rose-400";
+          statusMsg.innerText = "Erreur : " + err.message;
+        })
+        .updateTimerConfig({
+          adminPin: pin,
+          isOpen: isOpen,
+          targetDate: targetDate
+        });
+    }
+
+    function renderDashboardGrid(data) {
+      const container = document.getElementById('dashboard-grid');
+      container.innerHTML = '';
+
+      for (const [pKey, candidates] of Object.entries(data)) {
+        const title = PRIX_DETAILS[pKey] ? PRIX_DETAILS[pKey].title : pKey;
+        let html = `
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <h3 class="font-bold text-amber-400 text-base border-b border-slate-800 pb-2">${title}</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
+                    <th class="py-2">Candidat</th>
+                    <th class="py-2 text-center">Voix Ass.</th>
+                    <th class="py-2 text-center text-amber-500/80">Pts Ass. (/60)</th>
+                    <th class="py-2 text-center">Moy. Resp. (/20)</th>
+                    <th class="py-2 text-center text-amber-500/80">Pts Resp. (/40)</th>
+                    <th class="py-2 text-right font-bold text-amber-400">TOTAL (/100)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/50">
+        `;
+
+        candidates.forEach((c, i) => {
+          html += `
+            <tr class="${i === 0 ? 'bg-amber-500/10 font-bold text-white' : ''}">
+              <td class="py-2.5">${i === 0 ? '👑 ' : ''}${c.name}</td>
+              <td class="py-2.5 text-center">${c.votesAss}</td>
+              <td class="py-2.5 text-center text-amber-400">${c.scoreAss60}</td>
+              <td class="py-2.5 text-center text-slate-400">${c.avgResp20}</td>
+              <td class="py-2.5 text-center text-amber-400">${c.scoreResp40}</td>
+              <td class="py-2.5 text-right font-extrabold text-amber-400 text-sm">${c.scoreTotal100} pts</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table></div></div>`;
+        container.innerHTML += html;
+      }
+    }
+  </script>
+</body>
+</html>

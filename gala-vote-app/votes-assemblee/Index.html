@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gala des STARS - ICC Nancy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: { 850: '#131e32' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-100 flex flex-col selection:bg-amber-500 selection:text-white relative bg-[#0d0914]">
+
+  <!-- PHOTO DE FOND (PLACE STANISLAS) -->
+  <div class="fixed inset-0 -z-10 w-full h-full overflow-hidden pointer-events-none">
+    <img 
+      src="https://i.imgur.com/ivC0VEw.jpeg" 
+      alt="Place Stanislas Nancy" 
+      class="w-full h-full object-cover object-center opacity-10 filter blur-[1px]"
+    >
+    <div class="absolute inset-0 bg-gradient-to-b from-purple-950/25 via-slate-950/90 to-purple-950/25"></div>
+  </div>
+
+  <!-- EN-TÊTE / NAVIGATION -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/20 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- LOGO ICC NANCY -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
+        <img src="https://i.imgur.com/Qkbin3j.jpeg" alt="Logo ICC Nancy" class="w-12 h-12 object-contain rounded-xl border border-amber-500/30">
+        <div>
+          <span class="font-bold text-lg text-white block leading-tight">Gala des STARS</span>
+          <p class="text-xs text-amber-400 font-semibold tracking-wider uppercase">ICC Nancy</p>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="flex space-x-2">
+        <button onclick="showPage('home')" class="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-amber-400 hover:bg-slate-800 rounded-xl transition">Accueil</button>
+        <button onclick="showPage('admin')" class="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-amber-400 hover:bg-slate-800 rounded-xl transition">Admin</button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pt-8 sm:pt-12">
+
+    <!-- PAGE D'ACCUEIL -->
+    <section id="page-home" class="page-content space-y-8">
+      <div class="text-center space-y-3 pt-4 pb-2">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white">Célébrons l'Excellence & le Service</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">Votez en toute liberté : votre participation est <span class="text-amber-400 font-semibold">100 % anonyme</span>. Honorez avec bienveillance celles et ceux qui s'investissent au quotidien !</p>
+      </div>
+
+      <!-- BLOC COMPTE À REBOURS -->
+      <div id="countdown-banner" class="max-w-xl mx-auto bg-slate-800/80 border border-amber-500/30 rounded-2xl p-5 text-center shadow-xl backdrop-blur-sm">
+        <p id="timer-status-title" class="text-xs uppercase tracking-wider text-amber-400 font-bold mb-3 flex items-center justify-center space-x-1">
+          <span>⏳</span> <span>Temps restant pour voter</span>
+        </p>
+        <div id="timer-display" class="flex justify-center space-x-4 text-white">
+          <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl w-16 shadow-inner">
+            <span id="timer-days" class="block text-2xl font-bold text-amber-400">00</span>
+            <span class="text-[10px] text-slate-400 uppercase font-semibold">Jours</span>
+          </div>
+          <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl w-16 shadow-inner">
+            <span id="timer-hours" class="block text-2xl font-bold text-amber-400">00</span>
+            <span class="text-[10px] text-slate-400 uppercase font-semibold">Heures</span>
+          </div>
+          <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl w-16 shadow-inner">
+            <span id="timer-minutes" class="block text-2xl font-bold text-amber-400">00</span>
+            <span class="text-[10px] text-slate-400 uppercase font-semibold">Min</span>
+          </div>
+          <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-xl w-16 shadow-inner">
+            <span id="timer-seconds" class="block text-2xl font-bold text-amber-400">00</span>
+            <span class="text-[10px] text-slate-400 uppercase font-semibold">Sec</span>
+          </div>
+        </div>
+        <p id="timer-stopped-msg" class="hidden text-amber-400 font-bold text-sm py-2">🔒 Les votes sont actuellement fermés.</p>
+      </div>
+
+      <!-- GRILLE DES 6 PRIX GÉNÉRÉE DYNAMIQUEMENT EN JS -->
+      <div id="prix-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- PAGES PRIX 1 À 6 -->
+    <section id="page-prix1" class="page-content hidden space-y-6">
+      <div class="flex items-center space-x-4">
+        <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+        <h2 id="prix1-title-header" class="text-2xl font-bold text-white">Prix N°1</h2>
+      </div>
+      <div id="candidates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <section id="page-prix2" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix2" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <section id="page-prix3" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix3" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <section id="page-prix4" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix4" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <section id="page-prix5" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix5" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <section id="page-prix6" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix6" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <section id="page-prix7" class="page-content hidden space-y-6">
+      <button onclick="showPage('home')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 transition">← Retour</button>
+      <div id="container-prix7" class="max-w-xl mx-auto"></div>
+    </section>
+
+    <!-- PAGE ADMIN -->
+    <section id="page-admin" class="page-content hidden max-w-2xl mx-auto space-y-6">
+      <div id="admin-lock" class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4 text-center shadow-xl">
+        <h3 class="text-xl font-bold text-white">Espace Administration</h3>
+        <input type="password" id="admin-pin" placeholder="Entrez le code PIN" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white text-center focus:border-amber-500 outline-none">
+        <button onclick="unlockResults()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition">Accéder</button>
+        <p id="admin-error" class="text-sm font-semibold text-red-400"></p>
+      </div>
+
+      <div id="admin-content" class="hidden space-y-6">
+        
+        <!-- CONTROLE DU COMPTE A REBOURS -->
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
+          <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+            <span>⏱️</span> <span>Gestion du Compte à Rebours</span>
+          </h3>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Date et Heure de fin des votes</label>
+            <input type="datetime-local" id="admin-target-date" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white text-sm outline-none focus:border-amber-500">
+          </div>
+          
+          <div class="flex space-x-3">
+            <button onclick="updateCountdown(true)" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition">Démarrer le Décompte</button>
+            <button onclick="updateCountdown(false)" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl text-sm transition">Arrêter / Stopper</button>
+          </div>
+          <p id="admin-timer-status" class="text-center text-xs font-semibold min-h-[16px]"></p>
+        </div>
+
+        <!-- RESULTATS EN DIRECT -->
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h3 class="text-xl font-bold text-white mb-4">Résultats en direct</h3>
+          <div id="results-display"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TEMPLATE VOTE LIBRE (PRIX 2 À 6) -->
+  <template id="free-vote-template">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4 shadow-xl">
+      <h3 class="title-placeholder text-2xl font-bold text-amber-400 text-center"></h3>
+      <p class="desc-placeholder text-xs text-slate-400 text-center italic"></p>
+      
+      <!-- Rappel dynamique des critères -->
+      <div class="criteres-box bg-slate-900/60 border border-slate-700/60 p-4 rounded-xl space-y-2">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
+          <span>🎯</span><span>Critères de sélection</span>
+        </h4>
+        <ul class="criteres-list text-xs text-slate-300 space-y-1 list-disc list-inside"></ul>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1">Nom & Prénom de la personne choisie *</label>
+        <input type="text" class="input-name w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white text-sm outline-none focus:border-amber-500" placeholder="Ex: Jean Dupont">
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1">Justification de votre vote *</label>
+        <textarea class="input-reason w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white text-sm outline-none resize-none focus:border-amber-500" rows="3" maxlength="200" placeholder="Pourquoi ce choix ? (Obligatoire)"></textarea>
+        <div class="text-right text-xs text-slate-400"><span class="char-count">0</span>/200</div>
+      </div>
+
+      <div class="status-msg text-center text-sm font-semibold"></div>
+
+      <button class="submit-btn w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg">Valider mon vote</button>
+    </div>
+  </template>
+
+  <?!= include('Modal'); ?>
+  <?!= include('JavaScript'); ?>
+</body>
+</html>

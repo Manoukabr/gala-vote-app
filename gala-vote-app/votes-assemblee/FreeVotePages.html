@@ -1,0 +1,43 @@
+<!-- Génération identique pour Prix 2, 3, 4 et 5 -->
+<template id="free-vote-template">
+  <div class="max-w-lg mx-auto bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+    <h2 class="text-2xl font-bold text-white mb-4 title-placeholder"></h2>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Nom de la personne choisie *</label>
+        <input type="text" class="input-name w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Raison du vote (max 200 car.)</label>
+        <textarea maxlength="200" rows="3" class="input-reason w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white text-sm outline-none resize-none"></textarea>
+        <div class="text-right text-xs text-slate-400"><span class="char-count">0</span>/200</div>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Votre jeton secret *</label>
+        <input type="text" class="input-token w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white uppercase text-center font-mono outline-none">
+      </div>
+      <div class="status-msg text-center text-sm font-semibold"></div>
+      <button class="submit-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all">Valider mon vote</button>
+    </div>
+  </div>
+</template>
+
+<div id="page-prix2" class="page-content hidden">
+  <button onclick="showPage('home')" class="mb-4 text-sm text-indigo-400 hover:underline">← Retour à l'accueil</button>
+  <div id="container-prix2"></div>
+</div>
+
+<div id="page-prix3" class="page-content hidden">
+  <button onclick="showPage('home')" class="mb-4 text-sm text-indigo-400 hover:underline">← Retour à l'accueil</button>
+  <div id="container-prix3"></div>
+</div>
+
+<div id="page-prix4" class="page-content hidden">
+  <button onclick="showPage('home')" class="mb-4 text-sm text-indigo-400 hover:underline">← Retour à l'accueil</button>
+  <div id="container-prix4"></div>
+</div>
+
+<div id="page-prix5" class="page-content hidden">
+  <button onclick="showPage('home')" class="mb-4 text-sm text-indigo-400 hover:underline">← Retour à l'accueil</button>
+  <div id="container-prix5"></div>
+</div>
